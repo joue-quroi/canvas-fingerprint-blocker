@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Options :: Canvas Blocker (Fingerprint protect)</title>
+  </head>
+
+  <body style="min-width: 500px">
+    <table width=100%>
+      <colgroup>
+        <col width=24>
+        <col>
+      </colgroup>
+      <tr>
+        <td><input type="checkbox" id="notification"></td>
+        <td><label for="notification">Do not display desktop notifications on a fingerprint attempt</label></td>
+      </tr>
+    </table>
+
+    <h2>Exception list</h2>
+    <span style="display: block;">Comma-separated list of hostnames e.g.: www.google.com)</span>
+    <br>
+    <textarea id="list" style="width: 100%" rows="4"></textarea>
+
+    <p>
+      <input type="button" id="support" value="Support Development">
+      <input type="button" id="reset" value="Factory Reset">
+      <input type="button" id="save" value="Save">
+      <span id="info"></span>
+    </p>
+
+    <script src="index.js"></script>
+  </body>
+</html>

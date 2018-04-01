@@ -1,7 +1,8 @@
 'use strict';
 
 var script = document.createElement('script');
-script.textContent = `{
+script.textContent = `
+{
   const toBlob = HTMLCanvasElement.prototype.toBlob;
   const toDataURL = HTMLCanvasElement.prototype.toDataURL;
 
@@ -31,13 +32,17 @@ script.textContent = `{
 
   Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
     value: function() {
-      this.htGfd();
+      if (document.documentElement.dataset.htgfd !== 'false') {
+        this.htGfd();
+      }
       return toBlob.apply(this, arguments);
     }
   });
   Object.defineProperty(HTMLCanvasElement.prototype, 'toDataURL', {
     value: function() {
-      this.htGfd();
+      if (document.documentElement.dataset.htgfd !== 'false') {
+        this.htGfd();
+      }
       return toDataURL.apply(this, arguments);
     }
   });

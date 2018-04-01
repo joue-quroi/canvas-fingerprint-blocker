@@ -1,7 +1,7 @@
 'use strict';
 
 chrome.runtime.onMessage.addListener((request, sender) => {
-  if (request.method === 'possible-fingerprint') {
+  if (request.method === 'possible-fingerprint' && localStorage.getItem('notification') !== 'true') {
     chrome.notifications.create({
       type: 'basic',
       title: chrome.runtime.getManifest().name,
@@ -10,6 +10,35 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     });
   }
 });
+
+// whitelist
+const cache = {};
+chrome.webNavigation.onCommitted.addListener(({tabId, frameId, url}) => {
+  if (url.startsWith('http')) {
+    if (frameId === 0) {
+      chrome.tabs.executeScript(tabId, {
+        code: `(() => {
+          const list = JSON.parse('${localStorage.getItem('list') || '[]'}');
+          if (list.indexOf(location.hostname) !== -1) {
+            document.documentElement.dataset.htgfd = false;
+            return true;
+          }
+          return false;
+        })()`,
+        frameId,
+        runAt: 'document_start'
+      }, a => cache[tabId] = a[0]);
+    }
+    else if (cache[tabId]) {
+      chrome.tabs.executeScript(tabId, {
+        code: 'document.documentElement.dataset.htgfd = false;',
+        frameId,
+        runAt: 'document_start'
+      });
+    }
+  }
+});
+chrome.tabs.onRemoved.addListener(tabId => delete cache[tabId]);
 
 // FAQs & Feedback
 chrome.storage.local.get({
