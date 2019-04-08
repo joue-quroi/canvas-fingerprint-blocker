@@ -1,10 +1,8 @@
 'use strict';
 
-let counts = {};
-
 chrome.runtime.onMessage.addListener((request, sender) => {
   if (request.method === 'possible-fingerprint') {
-    if (localStorage.getItem('notification') !== 'true') {
+    if (localStorage.getItem('notification') !== 'true' && request.notification) {
       chrome.notifications.create({
         type: 'basic',
         title: chrome.runtime.getManifest().name,
@@ -12,9 +10,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
         iconUrl: '/data/icons/48.png'
       });
     }
-    let tabId = sender.tab.id;
-    counts[tabId] = (counts[tabId] || 0) + 1;
-    chrome.browserAction.setBadgeText({text: counts[tabId].toString(), tabId: tabId});
+    chrome.browserAction.setBadgeText({ text: request.count.toString(), tabId: sender.tab.id });
   }
 });
 

@@ -76,11 +76,20 @@
     delete document.documentElement.dataset.htGfd;
   }
 
+  if (window.top === window.self) {
+    window.top.canvasFingerprintBlockerCount = 0;
+    window.top.canvasFingerprintBlockerNotificationTime = 0;
+  }
+
   window.addEventListener('message', ({ data }) => {
     if (data && data === 'htGfd-called') {
+      ++window.top.canvasFingerprintBlockerCount;
       chrome.runtime.sendMessage({
-        method: 'possible-fingerprint'
+        method: 'possible-fingerprint',
+        count: window.top.canvasFingerprintBlockerCount,
+        notification: (Date.now() > window.top.canvasFingerprintBlockerNotificationTime + 10000)
       });
+      window.top.canvasFingerprintBlockerNotificationTime = Date.now();
     }
   }, false);
 })();
