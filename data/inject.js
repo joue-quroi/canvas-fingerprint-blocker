@@ -58,10 +58,11 @@
   document.documentElement.appendChild(script);
   script.parentNode.removeChild(script);
   // make sure the script is injected
-  if (document.documentElement.dataset.htGfd !== 'true') {
-    document.documentElement.dataset.htGfd = true;
-    window.top.document.documentElement.appendChild(Object.assign(document.createElement('script'), {
-      textContent: `
+  if (document.documentElement.dataset !== undefined) {
+    if (document.documentElement.dataset.htGfd !== 'true') {
+      document.documentElement.dataset.htGfd = true;
+      window.top.document.documentElement.appendChild(Object.assign(document.createElement('script'), {
+        textContent: `
       [...document.querySelectorAll('iframe[sandbox]')]
         .filter(i => i.contentDocument.documentElement.dataset.htGfd === 'true')
         .forEach(i => {
@@ -70,9 +71,10 @@
           i.contentWindow.HTMLCanvasElement.prototype.htGfd = HTMLCanvasElement.prototype.htGfd;
         });
     `
-    }));
+      }));
+    }
+    delete document.documentElement.dataset.htGfd;
   }
-  delete document.documentElement.dataset.htGfd;
 
   window.addEventListener('message', ({ data }) => {
     if (data && data === 'htGfd-called') {
