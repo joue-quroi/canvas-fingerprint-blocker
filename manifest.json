@@ -38,6 +38,9 @@
       "background.js"
     ]
   },
+
+  "browser_action": {},
+
   "options_ui": {
     "page": "data/options/index.html",
     "chrome_style": true
