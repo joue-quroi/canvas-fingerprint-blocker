@@ -1,13 +1,20 @@
 'use strict';
 
+let counts = {};
+
 chrome.runtime.onMessage.addListener((request, sender) => {
-  if (request.method === 'possible-fingerprint' && localStorage.getItem('notification') !== 'true') {
-    chrome.notifications.create({
-      type: 'basic',
-      title: chrome.runtime.getManifest().name,
-      message: `Possible attempt to fingerprint from "${sender.tab.title}" is blocked.`,
-      iconUrl: '/data/icons/48.png'
-    });
+  if (request.method === 'possible-fingerprint') {
+    if (localStorage.getItem('notification') !== 'true') {
+      chrome.notifications.create({
+        type: 'basic',
+        title: chrome.runtime.getManifest().name,
+        message: `Possible attempt to fingerprint from "${sender.tab.title}" is blocked.`,
+        iconUrl: '/data/icons/48.png'
+      });
+    }
+    let tabId = sender.tab.id;
+    counts[tabId] = (counts[tabId] || 0) + 1;
+    chrome.browserAction.setBadgeText({text: counts[tabId].toString(), tabId: tabId});
   }
 });
 
