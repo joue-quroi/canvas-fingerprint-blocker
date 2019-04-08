@@ -1,7 +1,13 @@
-'use strict';
+(function () {
+  'use strict';
 
-var script = document.createElement('script');
-script.textContent = `
+  // Only for HTMLDocument. XMLDocument won't have HTMLCanvasElement child.
+  if (document instanceof XMLDocument) {
+    return;
+  }
+
+  var script = document.createElement('script');
+  script.textContent = `
 {
   const toBlob = HTMLCanvasElement.prototype.toBlob;
   const toDataURL = HTMLCanvasElement.prototype.toDataURL;
@@ -48,12 +54,12 @@ script.textContent = `
   });
   document.documentElement.dataset.htGfd = true;
 }`;
-document.documentElement.appendChild(script);
-// make sure the script is injected
-if (document.documentElement.dataset.htGfd !== 'true') {
-  document.documentElement.dataset.htGfd = true;
-  window.top.document.documentElement.appendChild(Object.assign(document.createElement('script'), {
-    textContent: `
+  document.documentElement.appendChild(script);
+  // make sure the script is injected
+  if (document.documentElement.dataset.htGfd !== 'true') {
+    document.documentElement.dataset.htGfd = true;
+    window.top.document.documentElement.appendChild(Object.assign(document.createElement('script'), {
+      textContent: `
       [...document.querySelectorAll('iframe[sandbox]')]
         .filter(i => i.contentDocument.documentElement.dataset.htGfd === 'true')
         .forEach(i => {
@@ -62,14 +68,15 @@ if (document.documentElement.dataset.htGfd !== 'true') {
           i.contentWindow.HTMLCanvasElement.prototype.htGfd = HTMLCanvasElement.prototype.htGfd;
         });
     `
-  }));
-}
-delete document.documentElement.dataset.htGfd;
-
-window.addEventListener('message', ({data}) => {
-  if (data && data === 'htGfd-called') {
-    chrome.runtime.sendMessage({
-      method: 'possible-fingerprint'
-    });
+    }));
   }
-}, false);
+  delete document.documentElement.dataset.htGfd;
+
+  window.addEventListener('message', ({ data }) => {
+    if (data && data === 'htGfd-called') {
+      chrome.runtime.sendMessage({
+        method: 'possible-fingerprint'
+      });
+    }
+  }, false);
+})();
