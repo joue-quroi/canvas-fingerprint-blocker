@@ -56,6 +56,7 @@
   var script = document.createElement('script');
   script.textContent = '(' + inject + ')();';
   document.documentElement.appendChild(script);
+  script.parentNode.removeChild(script);
   // make sure the script is injected
   if (document.documentElement.dataset.htGfd !== 'true') {
     document.documentElement.dataset.htGfd = true;
