@@ -10,8 +10,8 @@
     const toBlob = HTMLCanvasElement.prototype.toBlob;
     const toDataURL = HTMLCanvasElement.prototype.toDataURL;
 
-    HTMLCanvasElement.prototype.htGfd = function() {
-      const {width, height} = this;
+    HTMLCanvasElement.prototype.htGfd = function () {
+      const { width, height } = this;
       const context = this.getContext('2d');
       const shift = {
         'r': Math.floor(Math.random() * 10) - 5,
@@ -35,22 +35,22 @@
     };
 
     Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-      value: function() {
-        if (document.documentElement.dataset.htgfd !== 'false') {
+      value: function () {
+        if (document.documentElement.dataset.htGfd !== 'false') {
           this.htGfd();
         }
         return toBlob.apply(this, arguments);
       }
     });
     Object.defineProperty(HTMLCanvasElement.prototype, 'toDataURL', {
-      value: function() {
-        if (document.documentElement.dataset.htgfd !== 'false') {
+      value: function () {
+        if (document.documentElement.dataset.htGfd !== 'false') {
           this.htGfd();
         }
         return toDataURL.apply(this, arguments);
       }
     });
-    document.documentElement.dataset.htGfd = true;
+    document.documentElement.dataset.htGfd = 'true';
   }
 
   var script = document.createElement('script');
@@ -60,7 +60,7 @@
   // make sure the script is injected
   if (document.documentElement.dataset !== undefined) {
     if (document.documentElement.dataset.htGfd !== 'true') {
-      document.documentElement.dataset.htGfd = true;
+      document.documentElement.dataset.htGfd = 'true';
       window.top.document.documentElement.appendChild(Object.assign(document.createElement('script'), {
         textContent: `
       [...document.querySelectorAll('iframe[sandbox]')]
