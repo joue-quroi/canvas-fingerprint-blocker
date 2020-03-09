@@ -13,22 +13,29 @@
       </colgroup>
       <tr>
         <td><input type="checkbox" id="notification"></td>
-        <td><label for="notification">Do not display desktop notifications on a fingerprint attempt</label></td>
+        <td><label for="notification">Do not display desktop notification on a fingerprint attempt</label></td>
       </tr>
     </table>
 
     <h2>Exception list</h2>
-    <span style="display: block;">Comma-separated list of hostnames e.g.: www.google.com)</span>
+    <span style="display: block;">Comma-separated list of hostnames (e.g.: www.google.com) to allow canvas fingerprinting</span>
     <br>
     <textarea id="list" style="width: 100%" rows="4"></textarea>
 
+    <h2>Notification exception list</h2>
+    <span style="display: block;">Comma-separated list of hostnames (e.g.: www.google.com) to to disable desktop notification for</span>
+    <br>
+    <textarea id="notification.list" style="width: 100%" rows="4"></textarea>
+
+    <div id="explore"></div>
     <p>
       <input type="button" id="support" value="Support Development">
       <input type="button" id="reset" value="Factory Reset">
       <input type="button" id="save" value="Save">
-      <span id="info"></span>
+      <span id="toast"></span>
     </p>
 
     <script src="index.js"></script>
+    <script async src="matched.js"></script>
   </body>
 </html>

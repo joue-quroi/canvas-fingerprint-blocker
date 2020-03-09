@@ -1,0 +1,50 @@
+{
+  "manifest_version": 2,
+  "version": "0.1.2",
+  "name": "Canvas Blocker (Fingerprint protect)",
+  "description": "Prevent HTML canvas element from generating a unique identification key to protect user's privacy",
+
+  "icons": {
+    "16": "data/icons/16.png",
+    "19": "data/icons/19.png",
+    "32": "data/icons/32.png",
+    "38": "data/icons/38.png",
+    "48": "data/icons/48.png",
+    "64": "data/icons/64.png",
+    "128": "data/icons/128.png",
+    "256": "data/icons/256.png"
+  },
+
+  "permissions": [
+    "*://*/*",
+    "tabs",
+    "notifications",
+    "storage",
+    "webNavigation",
+    "contextMenus"
+  ],
+
+  "homepage_url": "https://add0n.com/canvas-fingerprint-blocker.html",
+
+  "content_scripts": [{
+    "all_frames": true,
+    "matches": ["*://*/*"],
+    "match_about_blank": true,
+    "run_at": "document_start",
+    "js": [
+      "data/inject.js"
+    ]
+  }],
+
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "page_action": {},
+  "options_ui": {
+    "page": "data/options/index.html",
+    "chrome_style": true
+  }
+}
