@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Options Page :: Canvas Blocker - Fingerprint Protect</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+
+  <body>
+    <label><input type="checkbox" id="notification"> Display desktop notification on a fingerprint attempt</label>
+    <p>
+      <label>Operation mode:</label>
+      <select style="float: right;" id="mode">
+        <option value="random">Random Fingerprint</option>
+        <option value="session">Random Fingerprint (per page load)</option>
+        <option value="fixed">Fixed Fingerprint</option>
+      </select>
+    </p>
+
+    <h2>Spoofing Exception List</h2>
+    <span class="desv">List of hostnames separated by commas (e.g., www.google.com) to discard canvas fingerprinting</span>
+    <textarea id="list" rows="4"></textarea>
+
+    <h2>Notification Exception List</h2>
+    <span class="desv">List of hostnames separated by commas (e.g., www.google.com) to disable desktop notification</span>
+    <textarea id="notification.list" rows="4"></textarea>
+
+    <p>
+      <input type="button" id="support" value="Support Development">
+      <input type="button" id="reset" value="Factory Reset">
+    </p>
+    <div id="explore"></div>
+    <p>
+      <input type="button" id="save" value="Save Options">
+      <span id="toast"></span>
+    </p>
+
+    <script src="index.js"></script>
+    <script async src="matched.js"></script>
+  </body>
+</html>

@@ -1,31 +1,29 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Options :: Canvas Blocker (Fingerprint protect)</title>
+    <title>Canvas Blocker (Fingerprint protect) :: Options Page</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
   </head>
 
   <body>
-    <table width=100%>
-      <colgroup>
-        <col width=24>
-        <col>
-      </colgroup>
-      <tr>
-        <td><input type="checkbox" id="notification"></td>
-        <td><label for="notification">Do not display desktop notification on a fingerprint attempt</label></td>
-      </tr>
-    </table>
+    <label><input type="checkbox" id="notification"> Do not display desktop notification on a fingerprint attempt</label>
+    <p>
+      <label>Operation mode:</label>
+      <select style="float: right;" id="mode">
+        <option value="random">Random Fingerprint</option>
+        <option value="session">Random Fingerprint (per session)</option>
+        <option value="fixed">Fixed Fingerprint</option>
+      </select>
+    </p>
 
     <h2>Exception list</h2>
     <span style="display: block;">Comma-separated list of hostnames (e.g.: www.google.com) to allow canvas fingerprinting</span>
-    <br>
-    <textarea id="list" style="width: 100%" rows="4"></textarea>
+    <textarea id="list" rows="4"></textarea>
 
     <h2>Notification exception list</h2>
     <span style="display: block;">Comma-separated list of hostnames (e.g.: www.google.com) to to disable desktop notification for</span>
-    <br>
-    <textarea id="notification.list" style="width: 100%" rows="4"></textarea>
+    <textarea id="notification.list" rows="4"></textarea>
 
     <div id="explore"></div>
     <p>

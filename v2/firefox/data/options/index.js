@@ -11,10 +11,15 @@ document.getElementById('save').addEventListener('click', () => {
       .map(s => s.startsWith('http') || s.startsWith('ftp') ? (new URL(s)).hostname : s)
       .filter((h, i, l) => h && l.indexOf(h) === i);
     localStorage.setItem('list', JSON.stringify(list));
+
     document.getElementById('list').value = list.join(', ');
+
+    localStorage.setItem('mode', document.getElementById('mode').value);
+
     // update preference
     chrome.runtime.getBackgroundPage(bg => {
-      bg.list = list;
+      bg.prefs.list = list;
+      bg.prefs.mode = document.getElementById('mode').value;
     });
   }
   {
@@ -52,3 +57,4 @@ document.getElementById('support').addEventListener('click', () => chrome.tabs.c
 document.getElementById('notification').checked = localStorage.getItem('notification') === 'true';
 document.getElementById('list').value = JSON.parse(localStorage.getItem('list') || '[]').join(', ');
 document.getElementById('notification.list').value = JSON.parse(localStorage.getItem('notification.list') || '[]').join(', ');
+document.getElementById('mode').value = localStorage.getItem('mode') || 'random';

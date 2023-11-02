@@ -26,7 +26,6 @@ chrome.runtime.onMessage.addListener((request, sender) => {
   }
   if (request.method === 'possible-fingerprint' && localStorage.getItem('notification') !== 'true') {
     const list = JSON.parse(localStorage.getItem('notification.list') || '[]');
-    console.log(sender.tab);
     const {hostname} = new URL(sender.tab.url);
     if (list.indexOf(hostname) === -1) {
       notify(`Possible attempt to fingerprint from "${sender.tab.title}" is blocked.`);
@@ -35,24 +34,46 @@ chrome.runtime.onMessage.addListener((request, sender) => {
 });
 
 // whitelist
-window.list = JSON.parse(localStorage.getItem('list') || '[]');
+const prefs = window.prefs = {
+  list: JSON.parse(localStorage.getItem('list') || '[]'),
+  mode: localStorage.getItem('mode') || 'random', // 'random', 'session', 'fixed'
+  red: Number(localStorage.getItem('red') || 2),
+  green: Number(localStorage.getItem('green') || 1),
+  blue: Number(localStorage.getItem('blue') || -2)
+};
 
 const cache = {};
 chrome.webNavigation.onCommitted.addListener(({tabId, frameId, url}) => {
   if (url.startsWith('http')) {
     if (frameId === 0) {
       const {hostname} = new URL(url);
-      cache[tabId] = window.list.indexOf(hostname) !== -1;
+      cache[tabId] = prefs.list.indexOf(hostname) !== -1;
     }
-    if (cache[tabId]) {
-      chrome.tabs.executeScript(tabId, {
-        code: `try {
-          script.dataset.active = false;
-        } catch(e) {}`,
-        frameId,
-        runAt: 'document_start'
-      });
-    }
+    chrome.tabs.executeScript(tabId, {
+      code: `
+try {
+  script.dataset.active = ${cache[tabId] !== true};
+  script.dataset.mode = '${prefs.mode}';
+  if (${prefs.mode === 'fixed'}) {
+    script.dataset.red = '${prefs.red}';
+    script.dataset.green = '${prefs.green}';
+    script.dataset.blue = '${prefs.blue}';
+  }
+} catch(e) {
+  window.active = ${cache[tabId] !== true};
+  window.mode = '${prefs.mode}';
+  if (${prefs.mode === 'fixed'}) {
+    window.rnd = {
+      r: ${prefs.red},
+      g: ${prefs.green},
+      b: ${prefs.blue},
+    };
+  }
+}
+      `,
+      frameId,
+      runAt: 'document_start'
+    });
   }
 });
 chrome.tabs.onRemoved.addListener(tabId => delete cache[tabId]);
@@ -89,9 +110,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     const url = tab.url || info.pageUrl;
     if (url && url.startsWith('http')) {
       const {hostname} = new URL(url);
-      if (window.list.indexOf(hostname) === -1) {
-        window.list.push(hostname);
-        localStorage.setItem('list', JSON.stringify(window.list));
+      if (prefs.list.indexOf(hostname) === -1) {
+        prefs.list.push(hostname);
+        localStorage.setItem('list', JSON.stringify(prefs.list));
         notify(`"${hostname}" is added to the whitelist`);
       }
       else {
@@ -121,6 +142,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
   }
 });
+
 /* FAQs & Feedback */
 {
   const {management, runtime: {onInstalled, setUninstallURL, getManifest}, storage, tabs} = chrome;
@@ -135,10 +157,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         if (reason === 'install' || (prefs.faqs && reason === 'update')) {
           const doUpdate = (Date.now() - prefs['last-update']) / 1000 / 60 / 60 / 24 > 45;
           if (doUpdate && previousVersion !== version) {
-            tabs.create({
+            tabs.query({active: true, currentWindow: true}, tbs => tabs.create({
               url: page + '?version=' + version + (previousVersion ? '&p=' + previousVersion : '') + '&type=' + reason,
-              active: reason === 'install'
-            });
+              active: reason === 'install',
+              ...(tbs && tbs.length && {index: tbs[0].index + 1})
+            }));
             storage.local.set({'last-update': Date.now()});
           }
         }
