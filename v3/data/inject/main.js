@@ -9,12 +9,13 @@
 
   const revert = canvas => {
     const {width, height} = canvas;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext('2d', {willReadFrequently: true});
     const matt = getImageData.apply(context, [0, 0, width, height]);
     matt.data.set(map.get(canvas));
     map.delete(canvas);
 
-    canvas.getContext('2d').putImageData(matt, 0, 0);
+    // canvas.getContext('2d', {willReadFrequently: true}).putImageData(matt, 0, 0);
+    context.putImageData(matt, 0, 0);
   };
 
   const getImageData = CanvasRenderingContext2D.prototype.getImageData;
@@ -25,7 +26,7 @@
       return;
     }
     const {width, height} = canvas;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext('2d', {willReadFrequently: true});
     const matt = getImageData.apply(context, [0, 0, width, height]);
     map.set(canvas, matt.data);
 

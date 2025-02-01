@@ -1,12 +1,13 @@
 'use strict';
 
-const notify = message => {
-  chrome.notifications.create({
+const notify = async message => {
+  const id = await chrome.notifications.create({
     type: 'basic',
     title: chrome.runtime.getManifest().name,
     message,
     iconUrl: '/data/icons/48.png'
   });
+  setTimeout(chrome.notifications.clear, 3000, id);
 };
 
 chrome.runtime.onMessage.addListener((request, sender) => {
@@ -66,33 +67,54 @@ chrome.runtime.onMessage.addListener((request, sender) => {
   }
 });
 
-const observe = () => observe.busy !== true && chrome.storage.local.get({
-  enabled: true,
-  list: []
-}, async prefs => {
+const observe = async () => {
+  if (observe.busy) {
+    console.info('observer is busy');
+    return;
+  }
   observe.busy = true;
+
+  const prefs = await chrome.storage.local.get({
+    enabled: true,
+    list: []
+  });
   try {
     await chrome.scripting.unregisterContentScripts();
 
     if (prefs.enabled) {
       const excludeMatches = [];
+
       if (prefs.list) {
         for (const s of prefs.list) {
           try {
-            new self.URLPattern(`*://${s}/*`);
+            await chrome.scripting.registerContentScripts([{
+              id: 'test',
+              js: ['/data/inject/test.js'],
+              matches: [`*://${s}/*`]
+            }]);
             excludeMatches.push(`*://${s}/*`);
           }
           catch (e) {
             console.info('ignored rule', e);
             // notify(s + ' rule is ignored.');
           }
+          await chrome.scripting.unregisterContentScripts({
+            ids: ['test']
+          });
           try {
-            new self.URLPattern(`*://*.${s}/*`);
+            await chrome.scripting.registerContentScripts([{
+              id: 'test',
+              js: ['/data/inject/test.js'],
+              matches: [`*://*.${s}/*`]
+            }]);
             excludeMatches.push(`*://*.${s}/*`);
           }
           catch (e) {
             console.info('ignored rule', e);
           }
+          await chrome.scripting.unregisterContentScripts({
+            ids: ['test']
+          });
         }
       }
       if (excludeMatches.length) {
@@ -101,31 +123,10 @@ const observe = () => observe.busy !== true && chrome.storage.local.get({
           matchOriginAsFallback: true,
           id: 'disabled',
           js: ['/data/inject/disabled.js'],
-          matches: excludeMatches,
-          runAt: 'document_start'
+          runAt: 'document_start',
+          matches: excludeMatches
         }]);
       }
-
-      // await chrome.scripting.registerContentScripts([{
-      //   allFrames: true,
-      //   matchOriginAsFallback: true,
-      //   id: 'main',
-      //   js: ['/data/inject/main.js'],
-      //   matches: ['<all_urls>'],
-      //   runAt: 'document_start',
-      //   world: 'MAIN',
-      //   excludeMatches
-      // }]);
-      // await chrome.scripting.registerContentScripts([{
-      //   allFrames: true,
-      //   matchOriginAsFallback: true,
-      //   id: 'isolated',
-      //   js: ['/data/inject/isolated.js'],
-      //   matches: ['<all_urls>'],
-      //   runAt: 'document_start',
-      //   world: 'ISOLATED',
-      //   excludeMatches
-      // }]);
 
       chrome.action.setTitle({
         title: 'Globally Enabled'
@@ -162,12 +163,10 @@ const observe = () => observe.busy !== true && chrome.storage.local.get({
   catch (e) {
     console.error(e);
     notify('Unexpected Error: ' + e.message);
-    // chrome.storage.local.set({
-    //   enabled: false
-    // });
   }
   observe.busy = false;
-});
+};
+
 chrome.runtime.onInstalled.addListener(observe);
 chrome.runtime.onStartup.addListener(observe);
 chrome.storage.onChanged.addListener(ps => {
@@ -177,15 +176,23 @@ chrome.storage.onChanged.addListener(ps => {
 });
 
 // action
-chrome.action.onClicked.addListener(() => chrome.storage.local.get({
-  enabled: true
-}, prefs => chrome.storage.local.set({
-  enabled: !prefs.enabled
-})));
+chrome.action.onClicked.addListener(async () => {
+  const prefs = await chrome.storage.local.get({
+    enabled: true
+  });
+  chrome.storage.local.set({
+    enabled: !prefs.enabled
+  });
+});
 
 // context
 {
   const startup = () => {
+    if (startup.done) {
+      return;
+    }
+    startup.done = true;
+
     chrome.contextMenus.create({
       id: 'add-to-exception-list',
       title: 'Allow Fingerprint on This Hostname',
@@ -202,6 +209,7 @@ chrome.action.onClicked.addListener(() => chrome.storage.local.get({
       contexts: ['action']
     });
   };
+  chrome.runtime.onStartup.addListener(startup);
   chrome.runtime.onInstalled.addListener(startup);
 }
 chrome.contextMenus.onClicked.addListener((info, tab) => {
