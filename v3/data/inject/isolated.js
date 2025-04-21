@@ -6,7 +6,28 @@ if (port) {
     if (window === parent) {
       throw Error('exception');
     }
-    Object.assign(port.dataset, parent.port.dataset);
+    // Set up message listener for child frame to receive port dataset from 
+    // parent frame
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'PORT_DATASET' && event.data.origin === window.origin) {
+        // Update port dataset with received values
+        Object.assign(port.dataset, event.data.dataset);
+      }
+    });
+
+    // Request port dataset from parent
+    window.parent.postMessage({
+      type: 'REQUEST_PORT_DATASET',
+      origin: window.origin
+    }, '*');
+    console.log(`window URL ${window.location.href} origin ${window.origin} requested PORT_DATASET`);
+
+    // Set timeout for fallback to default values
+    setTimeout(() => {
+      if (!port.dataset.mode) {
+        throw Error('timeout');
+      }
+    }, 1000);
   }
   catch (e) {
     port.dataset.enabled = 'enabled' in self ? self.enabled : true;
@@ -87,3 +108,16 @@ if (port) {
 else {
   parent.postMessage('inject-script-into-source', '*');
 }
+
+// Event listener for parent to send port dataset to child frame
+window.addEventListener('message', (event) => {
+  if (event.data.type === 'REQUEST_PORT_DATASET') {
+    if (port) {
+      event.source.postMessage({
+        type: 'PORT_DATASET',
+        dataset: JSON.parse(JSON.stringify(port.dataset)),
+        origin: window.origin
+      }, '*');
+    }
+  }
+});

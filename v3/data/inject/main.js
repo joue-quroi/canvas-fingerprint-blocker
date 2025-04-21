@@ -1,6 +1,16 @@
 {
   const port = document.createElement('div');
   port.id = 'cc-blck-fp';
+
+  // Set initial values
+  if (window.top === window) {
+    port.dataset.enabled = true;
+    port.dataset.mode = 'session';
+    port.dataset.red = Math.floor(Math.random() * 10) - 5;
+    port.dataset.green = Math.floor(Math.random() * 10) - 5;
+    port.dataset.blue = Math.floor(Math.random() * 10) - 5;
+  }
+
   document.documentElement.appendChild(port);
 
   let gshift;
