@@ -23,7 +23,8 @@
   ],
   "homepage_url": "https://webextension.org/listing/canvas-fingerprint-blocker.html",
   "background": {
-    "service_worker": "worker.js"
+    "service_worker": "worker.js",
+    "scripts": ["worker.js"]
   },
   "action": {},
   "options_ui": {
@@ -46,5 +47,11 @@
     "all_frames": true,
     "run_at": "document_start",
     "js": ["/data/inject/isolated.js"]
-  }]
+  }],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{e98b4b87-bc39-439f-a175-b15fbe4a06c0}",
+      "strict_min_version": "128.0"
+    }
+  }
 }

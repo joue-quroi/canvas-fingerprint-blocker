@@ -6,7 +6,14 @@ if (port) {
     if (window === parent) {
       throw Error('exception');
     }
-    Object.assign(port.dataset, parent.port.dataset);
+    if (parent.document) {
+      if (parent.port) {
+        Object.assign(port.dataset, parent.port.dataset);
+      }
+      else { // Firefox; https://github.com/joue-quroi/canvas-fingerprint-blocker/issues/16
+        parent.postMessage('inject-script-into-source', '*');
+      }
+    }
   }
   catch (e) {
     port.dataset.enabled = 'enabled' in self ? self.enabled : true;
