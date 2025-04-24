@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "name": "Canvas Blocker - Fingerprint Protect",
   "description": "Prevent HTML canvas element from generating a unique identification key to protect user's privacy",
   "icons": {
