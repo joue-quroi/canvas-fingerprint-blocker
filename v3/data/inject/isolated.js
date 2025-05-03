@@ -3,13 +3,13 @@ const port = self.port = document.getElementById('cc-blck-fp');
 if (port) {
   port.remove();
 
-  // find user-agent data
-
+  // try to get preferences from performance
   for (const entry of performance.getEntriesByType('navigation')) {
     for (const timing of entry.serverTiming || []) {
       if (timing.name === 'cfp-json-data') {
         try {
           Object.assign(port.dataset, JSON.parse(decodeURIComponent(timing.description)));
+          port.dataset.dirty = false;
         }
         catch (e) {}
       }
