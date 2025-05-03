@@ -4,19 +4,20 @@
   "name": "Canvas Blocker - Fingerprint Protect",
   "description": "Prevent HTML canvas element from generating a unique identification key to protect user's privacy",
   "icons": {
-    "16": "/data/icons/16.png",
-    "32": "/data/icons/32.png",
-    "48": "/data/icons/48.png",
-    "64": "/data/icons/64.png",
-    "128": "/data/icons/128.png",
-    "256": "/data/icons/256.png",
-    "512": "/data/icons/512.png"
+    "16": "data/icons/16.png",
+    "32": "data/icons/32.png",
+    "48": "data/icons/48.png",
+    "64": "data/icons/64.png",
+    "128": "data/icons/128.png",
+    "256": "data/icons/256.png",
+    "512": "data/icons/512.png"
   },
   "permissions": [
     "notifications",
     "storage",
     "contextMenus",
-    "scripting"
+    "scripting",
+    "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
     "*://*/*"
@@ -29,7 +30,7 @@
   "action": {},
   "options_ui": {
     "open_in_tab": true,
-    "page": "/data/options/index.html"
+    "page": "data/options/index.html"
   },
   "content_scripts": [{
     "world": "MAIN",
@@ -38,7 +39,7 @@
     "match_origin_as_fallback": true,
     "all_frames": true,
     "run_at": "document_start",
-    "js": ["/data/inject/main.js"]
+    "js": ["data/inject/main.js"]
   }, {
     "world": "ISOLATED",
     "matches":["*://*/*"],
@@ -46,7 +47,7 @@
     "match_origin_as_fallback": true,
     "all_frames": true,
     "run_at": "document_start",
-    "js": ["/data/inject/isolated.js"]
+    "js": ["data/inject/isolated.js"]
   }],
   "browser_specific_settings": {
     "gecko": {

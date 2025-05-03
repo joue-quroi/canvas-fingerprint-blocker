@@ -76,7 +76,11 @@ const observe = async () => {
 
   const prefs = await chrome.storage.local.get({
     enabled: true,
-    list: []
+    list: [],
+    mode: 'session',
+    red: 4,
+    green: 4,
+    blue: 4
   });
   try {
     await chrome.scripting.unregisterContentScripts();
@@ -128,6 +132,32 @@ const observe = async () => {
         }]);
       }
 
+      await chrome.declarativeNetRequest.updateSessionRules({
+        addRules: [{
+          'id': 1,
+          'priority': 1,
+          'action': {
+            'type': 'modifyHeaders',
+            'responseHeaders': [{
+              'header': 'Server-Timing',
+              'operation': 'set',
+              'value': `cfp-json-data;dur=0;desc="${encodeURIComponent(JSON.stringify({
+                'enabled': prefs.enabled,
+                'mode': prefs.mode,
+                'red': prefs.red,
+                'green': prefs.green,
+                'blue': prefs.blue
+              }))}"`
+            }]
+          },
+          'condition': {
+            'requestDomains': prefs.whitelist,
+            'resourceTypes': ['main_frame', 'sub_frame']
+          }
+        }],
+        removeRuleIds: [1]
+      });
+
       chrome.action.setTitle({
         title: 'Globally Enabled'
       });
@@ -140,6 +170,10 @@ const observe = async () => {
       });
     }
     else {
+      await chrome.declarativeNetRequest.updateSessionRules({
+        addRules: [],
+        removeRuleIds: [1]
+      });
       await chrome.scripting.registerContentScripts([{
         allFrames: true,
         matchOriginAsFallback: true,

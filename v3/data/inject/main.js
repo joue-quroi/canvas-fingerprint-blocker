@@ -94,23 +94,26 @@
       return Reflect.apply(target, self, args);
     }
   });
+
+  // force inject to sandbox
+  {
+    const observe = e => {
+      if (e.source && e.data === 'inject-script-into-source') {
+        try {
+          e.source.HTMLCanvasElement.prototype.toBlob = HTMLCanvasElement.prototype.toBlob;
+          e.source.HTMLCanvasElement.prototype.toDataURL = HTMLCanvasElement.prototype.toDataURL;
+          e.source.CanvasRenderingContext2D.prototype.getImageData = CanvasRenderingContext2D.prototype.getImageData;
+
+          e.source.addEventListener('message', observe);
+
+          port.dataset.dirty = false;
+        }
+        catch (e) {
+          console.warn('Cannot spoof Canvas', e.source, e);
+        }
+      }
+    };
+    addEventListener('message', observe);
+  }
 }
 
-// force inject to sandbox
-{
-  const observe = e => {
-    if (e.source && e.data === 'inject-script-into-source') {
-      try {
-        e.source.HTMLCanvasElement.prototype.toBlob = HTMLCanvasElement.prototype.toBlob;
-        e.source.HTMLCanvasElement.prototype.toDataURL = HTMLCanvasElement.prototype.toDataURL;
-        e.source.CanvasRenderingContext2D.prototype.getImageData = CanvasRenderingContext2D.prototype.getImageData;
-
-        e.source.addEventListener('message', observe);
-      }
-      catch (e) {
-        console.warn('Cannot spoof Canvas', e.source, e);
-      }
-    }
-  };
-  addEventListener('message', observe);
-}

@@ -2,13 +2,30 @@ const port = self.port = document.getElementById('cc-blck-fp');
 
 if (port) {
   port.remove();
+
+  // find user-agent data
+
+  for (const entry of performance.getEntriesByType('navigation')) {
+    for (const timing of entry.serverTiming || []) {
+      if (timing.name === 'cfp-json-data') {
+        try {
+          Object.assign(port.dataset, JSON.parse(decodeURIComponent(timing.description)));
+        }
+        catch (e) {}
+      }
+    }
+  }
+
   try {
     if (window === parent) {
-      throw Error('exception');
+      if (!port.dataset.mode) {
+        throw Error('TIMING_FAILED');
+      }
     }
-    if (parent.document) {
+    else if (parent.document) {
       if (parent.port) {
         Object.assign(port.dataset, parent.port.dataset);
+        port.dataset.dirty = false;
       }
       else { // Firefox; https://github.com/joue-quroi/canvas-fingerprint-blocker/issues/16
         parent.postMessage('inject-script-into-source', '*');
@@ -21,6 +38,7 @@ if (port) {
     port.dataset.red = Math.floor(Math.random() * 10) - 5;
     port.dataset.green = Math.floor(Math.random() * 10) - 5;
     port.dataset.blue = Math.floor(Math.random() * 10) - 5;
+    port.dataset.dirty = true;
   }
   if (window.top === window) {
     if (port.dataset.enabled === 'true') {
@@ -50,6 +68,7 @@ if (port) {
       port.dataset.green = prefs.green;
       port.dataset.blue = prefs.blue;
     }
+    port.dataset.dirty = false;
   });
 
   chrome.storage.onChanged.addListener(ps => {
