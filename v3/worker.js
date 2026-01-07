@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     });
     chrome.action.setTitle({
       tabId: sender.tab.id,
-      title: 'Possible fingerprinting detected'
+      title: 'Possible attempt to fingerprint'
     });
     chrome.storage.local.get({
       'notification': false,
@@ -159,7 +159,7 @@ const observe = async () => {
       });
 
       chrome.action.setTitle({
-        title: 'Globally Enabled'
+        title: 'Fingerprint protection is globally enabled.'
       });
       chrome.action.setIcon({
         path: {
@@ -183,7 +183,7 @@ const observe = async () => {
         runAt: 'document_start'
       }]);
       chrome.action.setTitle({
-        title: 'Globally Disabled'
+        title: 'Fingerprint protection is disabled.'
       });
       chrome.action.setIcon({
         path: {
@@ -245,7 +245,7 @@ chrome.action.onClicked.addListener(async () => {
     if (navigator.userAgent.includes('Firefox')) {
       chrome.contextMenus.create({
         id: 'open-options',
-        title: 'Options',
+        title: 'Open Options Page',
         contexts: ['action']
       });
     }
@@ -259,7 +259,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
   else if (info.menuItemId === 'test-fingerprint') {
     chrome.tabs.create({
-      url: 'https://webbrowsertools.com/canvas-fingerprint/'
+      url: 'https://webbrowsertools.com/canvas-fingerprint/',
+      index: tab.index + 1,
+      openerTabId: tab.id
     });
   }
   else if (info.menuItemId === 'add-to-exception-list') {

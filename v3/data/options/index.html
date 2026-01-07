@@ -5,35 +5,38 @@
     <title>Options Page :: Canvas Blocker - Fingerprint Protect</title>
     <link rel="stylesheet" type="text/css" href="index.css">
   </head>
-
   <body>
-    <label><input type="checkbox" id="notification"> Display desktop notification on a fingerprint attempt</label>
-    <p>
+    <h2>Fingerprint Method</h2>
+    <div class="mode">
       <label>Operation mode:</label>
-      <select style="float: right;" id="mode">
+      <select id="mode">
         <option value="random">Random Fingerprint</option>
         <option value="session">Random Fingerprint (per page load)</option>
         <option value="fixed">Fixed Fingerprint</option>
       </select>
-    </p>
-
+    </div>
     <h2>Spoofing Exception List</h2>
-    <span class="desv">List of hostnames separated by commas (e.g., www.google.com) to discard canvas fingerprinting</span>
-    <textarea id="list" rows="4"></textarea>
-
+    <span class="desv">List of hostnames separated by commas to discard canvas fingerprinting</span>
+    <textarea id="list" rows="4" placeholder="e.g., www.google.com"></textarea>
     <h2>Notification Exception List</h2>
-    <span class="desv">List of hostnames separated by commas (e.g., www.google.com) to disable desktop notification</span>
-    <textarea id="notification.list" rows="4"></textarea>
-
+    <span class="desv">List of hostnames separated by commas to disable desktop notification</span>
+    <textarea id="notification.list" rows="4" placeholder="e.g., www.google.com"></textarea>
+    <h2>Other Options</h2>
     <p>
-      <input type="button" id="support" value="Support Development">
-      <input type="button" id="reset" value="Factory Reset">
+      <label><input type="checkbox" id="notification"> Display desktop notification on a fingerprint attempt</label>
+      <label><input type="checkbox" id="faqs"> Open FAQs page on updates</label>
     </p>
-    <p>
-      <input type="button" id="save" value="Save Options">
-      <span id="toast"></span>
-    </p>
-
+    <div class="tools">
+      <div>
+        <input type="button" id="support" value="Support Development">
+        <input type="button" id="reset" value="Factory Reset">
+      </div>
+      <div>
+        <input type="button" id="test" value="Test Protection">
+        <input type="button" id="save" value="Save Options">
+        <span id="toast"></span>
+      </div>
+    </div>
     <script src="index.js"></script>
   </body>
 </html>
