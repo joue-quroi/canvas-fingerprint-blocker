@@ -11,7 +11,14 @@
     const {width, height} = canvas;
     const context = canvas.getContext('2d', {willReadFrequently: true});
     const matt = getImageData.apply(context, [0, 0, width, height]);
-    matt.data.set(map.get(canvas));
+    const saved = map.get(canvas);
+
+    // Prevent crash on buffers missmatch, handle some rare edge case with Cloudflare Captcha (aka Cloudflare Turnstile)
+    if (!saved || saved.byteLength !== matt.data.byteLength) {
+      return;
+    }
+
+    matt.data.set(saved);
     map.delete(canvas);
 
     // canvas.getContext('2d', {willReadFrequently: true}).putImageData(matt, 0, 0);
